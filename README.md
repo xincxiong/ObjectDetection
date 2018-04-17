@@ -49,43 +49,39 @@ def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):
     # Step 3: Create a filtering mask based on "box_class_scores" by using "threshold". The mask should have the
     # same dimension as box_class_scores, and be True for the boxes you want to keep (with probability >= threshold)
     filtering_mask = K.greater_equal(box_class_scores, threshold)
-     
     # Step 4: Apply the mask to scores, boxes and classes
     ### START CODE HERE ### (≈ 3 lines)
     scores = tf.boolean_mask(box_class_scores, filtering_mask)
     boxes = tf.boolean_mask(boxes, filtering_mask)
     classes = tf.boolean_mask(box_classes, filtering_mask)
-    
     return scores, boxes, classes
-
 '''
-***
+
+
 
  2. Non-max suppression
     Even after filtering by thresholding over the classes scores, you still end up a lot of overlapping boxes. A second filter for selecting the right boxes is called non-maximum suppression (NMS). 
 
 '''
+
 def yolo_non_max_suppression(scores, boxes, classes, max_boxes = 10, iou_threshold = 0.5):
     # tensor to be used in tf.image.non_max_suppression()
     max_boxes_tensor = K.variable(max_boxes, dtype='int32')  
     # initialize variable max_boxes_tensor
     K.get_session().run(tf.variables_initializer([max_boxes_tensor])) 
-    
     # Use tf.image.non_max_suppression() to get the list of indices corresponding to boxes you keep
     nms_indices = tf.image.non_max_suppression(boxes, scores, max_boxes_tensor, iou_threshold=iou_threshold)   
     # Use K.gather() to select only nms_indices from scores, boxes and classes
     scores = K.gather(scores, nms_indices)
     boxes = K.gather(boxes, nms_indices)
-    classes = K.gather(classes, nms_indices)
-    
+    classes = K.gather(classes, nms_indices) 
     return scores, boxes, classes
 
 '''
 
 3. wrapping up the filtering 
  Implement yolo_eval() which takes the output of the YOLO encoding and filters the boxes using score threshold and NMS.
-Converts the output of YOLO encoding (a lot of boxes) to your predicted boxes along with their scores, box coordinates and classes.
-    
+Converts the output of YOLO encoding (a lot of boxes) to your predicted boxes along with their scores, box coordinates and classes.    
     Arguments:
     yolo_outputs -- output of the encoding model (for image_shape of (608, 608, 3)), contains 4 tensors:
                     box_confidence: tensor of shape (None, 19, 19, 5, 1)
@@ -95,8 +91,7 @@ Converts the output of YOLO encoding (a lot of boxes) to your predicted boxes al
     image_shape -- tensor of shape (2,) containing the input shape, in this notebook we use (608., 608.) (has to be float32 dtype)
     max_boxes -- integer, maximum number of predicted boxes you'd like
     score_threshold -- real value, if [ highest class probability score < threshold], then get rid of the corresponding box
-    iou_threshold -- real value, "intersection over union" threshold used for NMS filtering
-    
+    iou_threshold -- real value, "intersection over union" threshold used for NMS filtering  
     Returns:
     scores -- tensor of shape (None, ), predicted score for each box
     boxes -- tensor of shape (None, 4), predicted box coordinates
@@ -107,21 +102,16 @@ Converts the output of YOLO encoding (a lot of boxes) to your predicted boxes al
 def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_threshold=.6, iou_threshold=.5):
     # Retrieve outputs of the YOLO model (≈1 line)
     box_confidence, box_xy, box_wh, box_class_probs = yolo_outputs
-
     # Convert boxes to be ready for filtering functions 
     boxes = yolo_boxes_to_corners(box_xy, box_wh)
-
     # Use one of the functions you've implemented to perform Score-filtering with a threshold of score_threshold (≈1 line)
     scores, boxes, classes = yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = score_threshold)
-    
     # Scale boxes back to original image shape.
     boxes = scale_boxes(boxes, image_shape)
-
     # Use one of the functions you've implemented to perform Non-max suppression with a threshold of iou_threshold (≈1 line)
     scores, boxes, classes = yolo_non_max_suppression(scores, boxes, classes, max_boxes = max_boxes, iou_threshold = iou_threshold)
+    return scores, boxes, classes   
     
-    return scores, boxes, classes    
-
 '''
 
     Converts the output of YOLO encoding (a lot of boxes) to your predicted boxes along with their scores, box coordinates and classes.
