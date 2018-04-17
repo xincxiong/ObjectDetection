@@ -22,10 +22,8 @@ from keras import backend as K
    - box_confidence: tensor of shape  (19×19,5,1)(19×19,5,1)  containing  pcpc  (confidence probability that there's some object) for each of the 5 boxes predicted in each of the 19x19 cells.
    - boxes: tensor of shape  (19×19,5,4)(19×19,5,4)  containing  (bx,by,bh,bw)(bx,by,bh,bw)  for each of the 5 boxes per cell.
    - box_class_probs: tensor of shape  (19×19,5,80)(19×19,5,80)  containing the detection probabilities  (c1,c2,...c80)(c1,c2,...c80)  for each of the 80 classes for each of the 5 boxes per cell. 
-
-'''
-
-    """Filters YOLO boxes by thresholding on object and class confidence.    
+   
+     """Filters YOLO boxes by thresholding on object and class confidence.    
     Arguments:
     box_confidence -- tensor of shape (19, 19, 5, 1)
     boxes -- tensor of shape (19, 19, 5, 4)
@@ -40,6 +38,8 @@ from keras import backend as K
     Note: "None" is here because you don't know the exact number of selected boxes, as it depends on the threshold. 
     For example, the actual output size of scores would be (10,) if there are 10 boxes.
     """
+
+'''
 def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):    
     # Step 1: Compute box scores
     box_scores = np.multiply(box_confidence, box_class_probs)
@@ -56,7 +56,6 @@ def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):
     boxes = tf.boolean_mask(boxes, filtering_mask)
     classes = tf.boolean_mask(box_classes, filtering_mask)
     
-    
     return scores, boxes, classes
 
 '''
@@ -67,8 +66,10 @@ def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):
 
 '''
 def yolo_non_max_suppression(scores, boxes, classes, max_boxes = 10, iou_threshold = 0.5):
-    max_boxes_tensor = K.variable(max_boxes, dtype='int32')     # tensor to be used in tf.image.non_max_suppression()
-    K.get_session().run(tf.variables_initializer([max_boxes_tensor])) # initialize variable max_boxes_tensor
+    # tensor to be used in tf.image.non_max_suppression()
+    max_boxes_tensor = K.variable(max_boxes, dtype='int32')  
+    # initialize variable max_boxes_tensor
+    K.get_session().run(tf.variables_initializer([max_boxes_tensor])) 
     
     # Use tf.image.non_max_suppression() to get the list of indices corresponding to boxes you keep
     nms_indices = tf.image.non_max_suppression(boxes, scores, max_boxes_tensor, iou_threshold=iou_threshold)   
@@ -76,7 +77,6 @@ def yolo_non_max_suppression(scores, boxes, classes, max_boxes = 10, iou_thresho
     scores = K.gather(scores, nms_indices)
     boxes = K.gather(boxes, nms_indices)
     classes = K.gather(classes, nms_indices)
-    
     
     return scores, boxes, classes
 
@@ -124,10 +124,6 @@ def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_thr
 
 '''
 
-# GRADED FUNCTION: yolo_eval
-
-def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_threshold=.6, iou_threshold=.5):
-    """
     Converts the output of YOLO encoding (a lot of boxes) to your predicted boxes along with their scores, box coordinates and classes.
     
     Arguments:
@@ -145,9 +141,11 @@ def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_thr
     scores -- tensor of shape (None, ), predicted score for each box
     boxes -- tensor of shape (None, 4), predicted box coordinates
     classes -- tensor of shape (None,), predicted class for each box
-    """
-    
+ 
+# GRADED FUNCTION: yolo_eval
 
+def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_threshold=.6, iou_threshold=.5):
+   
     
     # Retrieve outputs of the YOLO model (≈1 line)
     box_confidence, box_xy, box_wh, box_class_probs = yolo_outputs
