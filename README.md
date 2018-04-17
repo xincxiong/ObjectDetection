@@ -11,6 +11,8 @@ Summary:
 from keras import backend as K
 
 '''
+
+***
 ## YOLO is a popular algorithm because it achieves high accuracy while also being able to run in real-time.
 
 1. ** _fileter with a threshold on class scores_**
@@ -23,8 +25,7 @@ from keras import backend as K
 
 '''
 def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):
-    """Filters YOLO boxes by thresholding on object and class confidence.
-    
+    """Filters YOLO boxes by thresholding on object and class confidence.    
     Arguments:
     box_confidence -- tensor of shape (19, 19, 5, 1)
     boxes -- tensor of shape (19, 19, 5, 4)
@@ -49,20 +50,20 @@ def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):
     ### START CODE HERE ### (≈ 2 lines)
     box_classes = K.argmax(box_scores, axis=-1)
     box_class_scores = K.max(box_scores, axis=-1)
-    ### END CODE HERE ###
+   
     
     # Step 3: Create a filtering mask based on "box_class_scores" by using "threshold". The mask should have the
     # same dimension as box_class_scores, and be True for the boxes you want to keep (with probability >= threshold)
     ### START CODE HERE ### (≈ 1 line)
     filtering_mask = K.greater_equal(box_class_scores, threshold)
-    ### END CODE HERE ###
+    
     
     # Step 4: Apply the mask to scores, boxes and classes
     ### START CODE HERE ### (≈ 3 lines)
     scores = tf.boolean_mask(box_class_scores, filtering_mask)
     boxes = tf.boolean_mask(boxes, filtering_mask)
     classes = tf.boolean_mask(box_classes, filtering_mask)
-    ### END CODE HERE ###
+    
     
     return scores, boxes, classes
 
