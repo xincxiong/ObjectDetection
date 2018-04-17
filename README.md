@@ -23,7 +23,7 @@ from keras import backend as K
    - boxes: tensor of shape  (19×19,5,4)(19×19,5,4)  containing  (bx,by,bh,bw)(bx,by,bh,bw)  for each of the 5 boxes per cell.
    - box_class_probs: tensor of shape  (19×19,5,80)(19×19,5,80)  containing the detection probabilities  (c1,c2,...c80)(c1,c2,...c80)  for each of the 80 classes for each of the 5 boxes per cell. 
    
-     """Filters YOLO boxes by thresholding on object and class confidence.    
+    Filters YOLO boxes by thresholding on object and class confidence.    
     Arguments:
     box_confidence -- tensor of shape (19, 19, 5, 1)
     boxes -- tensor of shape (19, 19, 5, 4)
@@ -37,7 +37,7 @@ from keras import backend as K
     
     Note: "None" is here because you don't know the exact number of selected boxes, as it depends on the threshold. 
     For example, the actual output size of scores would be (10,) if there are 10 boxes.
-    """
+    
 
 '''
 def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):    
@@ -59,10 +59,10 @@ def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):
     return scores, boxes, classes
 
 '''
-   
+***
+
  2. Non-max suppression
     Even after filtering by thresholding over the classes scores, you still end up a lot of overlapping boxes. A second filter for selecting the right boxes is called non-maximum suppression (NMS). 
-
 
 '''
 def yolo_non_max_suppression(scores, boxes, classes, max_boxes = 10, iou_threshold = 0.5):
