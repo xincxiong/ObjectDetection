@@ -6,11 +6,11 @@ Summary:
 
 ***
 
-'''
+```
 # need to write K.function(...)
 from keras import backend as K
 
-'''
+```
 
 ***
 ## YOLO is a popular algorithm because it achieves high accuracy while also being able to run in real-time.
@@ -39,7 +39,7 @@ from keras import backend as K
     For example, the actual output size of scores would be (10,) if there are 10 boxes.
     
 
-'''
+```
 def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):    
     # Step 1: Compute box scores
     box_scores = np.multiply(box_confidence, box_class_probs)
@@ -55,14 +55,14 @@ def yolo_filter_boxes(box_confidence, boxes, box_class_probs, threshold = .6):
     boxes = tf.boolean_mask(boxes, filtering_mask)
     classes = tf.boolean_mask(box_classes, filtering_mask)
     return scores, boxes, classes
-'''
+```
 
 
 
  2. Non-max suppression
     Even after filtering by thresholding over the classes scores, you still end up a lot of overlapping boxes. A second filter for selecting the right boxes is called non-maximum suppression (NMS). 
 
-'''
+```
 
 def yolo_non_max_suppression(scores, boxes, classes, max_boxes = 10, iou_threshold = 0.5):
     # tensor to be used in tf.image.non_max_suppression()
@@ -77,7 +77,7 @@ def yolo_non_max_suppression(scores, boxes, classes, max_boxes = 10, iou_thresho
     classes = K.gather(classes, nms_indices) 
     return scores, boxes, classes
 
-'''
+```
 
 3. wrapping up the filtering 
  Implement yolo_eval() which takes the output of the YOLO encoding and filters the boxes using score threshold and NMS.
@@ -98,7 +98,7 @@ Converts the output of YOLO encoding (a lot of boxes) to your predicted boxes al
     classes -- tensor of shape (None,), predicted class for each box
 
 
-'''
+```
 def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_threshold=.6, iou_threshold=.5):
     # Retrieve outputs of the YOLO model (≈1 line)
     box_confidence, box_xy, box_wh, box_class_probs = yolo_outputs
@@ -112,7 +112,7 @@ def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_thr
     scores, boxes, classes = yolo_non_max_suppression(scores, boxes, classes, max_boxes = max_boxes, iou_threshold = iou_threshold)
     return scores, boxes, classes   
     
-'''
+```
 
     Converts the output of YOLO encoding (a lot of boxes) to your predicted boxes along with their scores, box coordinates and classes.
     
@@ -134,6 +134,7 @@ def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_thr
  
 # GRADED FUNCTION: yolo_eval
 
+```
 def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_threshold=.6, iou_threshold=.5):
    
     
@@ -154,7 +155,7 @@ def yolo_eval(yolo_outputs, image_shape = (720., 1280.), max_boxes=10, score_thr
     
    
     return scores, boxes, classes
-'''
+```
  
  
 
